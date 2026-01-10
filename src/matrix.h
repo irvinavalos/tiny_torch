@@ -1,9 +1,12 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <memory>
+#include <ranges>
+#include <span>
 
 using usize = std::size_t;
 
@@ -28,6 +31,17 @@ class Matrix {
     constexpr usize size() const { return size_; }
 
     constexpr f32 at(usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
+
+    Matrix &operator+=(const Matrix &src) {
+        std::span<f32> spanSelf(this->data_.get(), size_);
+        std::span<f32> spanSrc(src.data_.get(), size_);
+
+        for (auto [refSelf, refSrc] : std::views::zip(spanSelf, spanSrc)) {
+            refSelf += refSrc;
+        }
+
+        return *this;
+    }
 
   private:
     usize nrows_;
