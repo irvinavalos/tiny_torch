@@ -34,11 +34,9 @@ class Matrix {
 
     Matrix &operator+=(const Matrix &src) {
         std::span<f32> spanSelf(this->data_.get(), size_);
-        std::span<f32> spanSrc(src.data_.get(), size_);
+        std::span<f32> spanSrc(src.data_.get(), src.size_);
 
-        for (auto [refSelf, refSrc] : std::views::zip(spanSelf, spanSrc)) {
-            refSelf += refSrc;
-        }
+        for (auto [refSelf, refSrc] : std::views::zip(spanSelf, spanSrc)) refSelf += refSrc;
 
         return *this;
     }
