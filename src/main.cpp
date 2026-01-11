@@ -5,11 +5,11 @@ int main() {
     Matrix m1{2, 2, 2.0f};
     Matrix m2{2, 2, 1.0f};
 
-    m1 += m2;
+    m1 -= m2;
 
-    Matrix m3 = m1 + m1;
+    Matrix m3 = m1 - m2;
 
-    std::println("Matrix 3 = Matrix 1 + Matrix 2");
+    std::println("Matrix 3 = Matrix 1 - Matrix 2");
     matPrint(m3);
 
     std::println("Matrix 1");

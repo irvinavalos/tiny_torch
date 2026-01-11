@@ -49,6 +49,23 @@ class Matrix {
         return ret;
     }
 
+    constexpr Matrix &operator-=(const Matrix &other) {
+        // TODO: Implement error checking for matrices of different rows / columns
+        std::span<f32> spanSelf(this->data_.get(), size_);
+        std::span<f32> spanOther(other.data_.get(), other.size_);
+
+        for (auto [refSelf, refOther] : std::views::zip(spanSelf, spanOther)) refSelf -= refOther;
+
+        return *this;
+    }
+
+    constexpr Matrix operator-(const Matrix &other) {
+        Matrix ret(this->nrows_, this->ncols_);
+        std::memcpy(ret.data_.get(), this->data_.get(), size_ * sizeof(f32));
+        ret -= other;
+        return ret;
+    }
+
     constexpr f32 &operator[](usize i, usize j) { return *(data_.get() + (ncols_ * i + j)); }
     constexpr const f32 &operator[](usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
 
