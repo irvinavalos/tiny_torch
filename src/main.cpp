@@ -9,11 +9,14 @@ int main() {
 
     Matrix m3 = m1 + m1;
 
-    std::println("Matrix 1 + Matrix 2");
+    std::println("Matrix 3 = Matrix 1 + Matrix 2");
     matPrint(m3);
 
     std::println("Matrix 1");
     matPrint(m1);
+
+    std::println("Matrix 1 at (0,0) = {}", m1[0, 0]);
+    std::println("Matrix 3 at (0,0) = {}", m3[0, 0]);
 
     return 0;
 }

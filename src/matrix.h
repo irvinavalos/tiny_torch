@@ -32,8 +32,6 @@ class Matrix {
     constexpr usize cols() const { return ncols_; }
     constexpr usize size() const { return size_; }
 
-    constexpr f32 at(usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
-
     constexpr Matrix &operator+=(const Matrix &other) {
         // TODO: Implement error checking for matrices of different rows / columns
         std::span<f32> spanSelf(this->data_.get(), size_);
@@ -50,6 +48,9 @@ class Matrix {
         ret += other;
         return ret;
     }
+
+    constexpr f32 &operator[](usize i, usize j) { return *(data_.get() + (ncols_ * i + j)); }
+    constexpr const f32 &operator[](usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
 
   private:
     usize nrows_;
