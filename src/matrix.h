@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <memory>
 #include <ranges>
 #include <span>
@@ -21,6 +22,7 @@ class Matrix {
     Matrix(usize nrows, usize ncols)
         : nrows_(nrows), ncols_(ncols), size_(nrows * ncols), data_(std::make_unique<f32[]>(nrows * ncols)) {}
 
+    // TODO: Check performance between std::make_unique and std::make_unique_for_overwrite
     Matrix(usize nrows, usize ncols, float fillVal)
         : nrows_(nrows), ncols_(ncols), size_(nrows * ncols), data_(std::make_unique<f32[]>(nrows * ncols)) {
         std::fill(data_.get(), data_.get() + size_, fillVal);
@@ -32,13 +34,21 @@ class Matrix {
 
     constexpr f32 at(usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
 
-    Matrix &operator+=(const Matrix &src) {
+    Matrix &operator+=(const Matrix &other) {
+        // TODO: Implement error checking for matrices of different rows / columns
         std::span<f32> spanSelf(this->data_.get(), size_);
-        std::span<f32> spanSrc(src.data_.get(), src.size_);
+        std::span<f32> spanOther(other.data_.get(), other.size_);
 
-        for (auto [refSelf, refSrc] : std::views::zip(spanSelf, spanSrc)) refSelf += refSrc;
+        for (auto [refSelf, refOther] : std::views::zip(spanSelf, spanOther)) refSelf += refOther;
 
         return *this;
+    }
+
+    Matrix operator+(const Matrix &other) {
+        Matrix ret(this->nrows_, this->ncols_);
+        std::memcpy(ret.data_.get(), this->data_.get(), size_ * sizeof(f32));
+        ret += other;
+        return ret;
     }
 
   private:
