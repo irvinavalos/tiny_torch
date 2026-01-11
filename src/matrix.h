@@ -34,7 +34,7 @@ class Matrix {
 
     constexpr f32 at(usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
 
-    Matrix &operator+=(const Matrix &other) {
+    constexpr Matrix &operator+=(const Matrix &other) {
         // TODO: Implement error checking for matrices of different rows / columns
         std::span<f32> spanSelf(this->data_.get(), size_);
         std::span<f32> spanOther(other.data_.get(), other.size_);
@@ -44,7 +44,7 @@ class Matrix {
         return *this;
     }
 
-    Matrix operator+(const Matrix &other) {
+    constexpr Matrix operator+(const Matrix &other) {
         Matrix ret(this->nrows_, this->ncols_);
         std::memcpy(ret.data_.get(), this->data_.get(), size_ * sizeof(f32));
         ret += other;
