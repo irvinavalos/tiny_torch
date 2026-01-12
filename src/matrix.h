@@ -17,16 +17,10 @@ using f32p = std::unique_ptr<f32[]>;
 
 class Matrix {
   public:
-    Matrix() : nrows_(0), ncols_(0), size_(0), data_(std::make_unique<f32[]>(0)) {}
-
-    Matrix(usize nrows, usize ncols)
-        : nrows_(nrows), ncols_(ncols), size_(nrows * ncols), data_(std::make_unique<f32[]>(nrows * ncols)) {}
-
+    Matrix();
+    Matrix(usize nrows, usize ncols);
     // TODO: Check performance between std::make_unique and std::make_unique_for_overwrite
-    Matrix(usize nrows, usize ncols, float fillVal)
-        : nrows_(nrows), ncols_(ncols), size_(nrows * ncols), data_(std::make_unique<f32[]>(nrows * ncols)) {
-        std::fill(data_.get(), data_.get() + size_, fillVal);
-    }
+    Matrix(usize nrows, usize ncols, float fillVal);
 
     constexpr usize rows() const { return nrows_; }
     constexpr usize cols() const { return ncols_; }
@@ -66,6 +60,7 @@ class Matrix {
         return ret;
     }
 
+    // TODO: Handle out of range errors
     constexpr f32 &operator[](usize i, usize j) { return *(data_.get() + (ncols_ * i + j)); }
     constexpr const f32 &operator[](usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
 
