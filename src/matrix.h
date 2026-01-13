@@ -1,7 +1,6 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <cstring>
@@ -73,6 +72,37 @@ class Matrix {
     f32p data_;
 };
 
-void matPrint(const Matrix &m);
+class Vector {
+  public:
+    Vector();
+    Vector(usize nele);
+    Vector(usize nele, f32 fillVal);
+
+    constexpr usize size() const { return size_; }
+
+    constexpr Vector &operator+=(const Vector &other) {
+        // TODO: Implement error checking for matrices of different rows / columns
+        this->data_ += other.data_;
+        return *this;
+    }
+
+    constexpr Vector &operator-=(const Vector &other) {
+        // TODO: Implement error checking for matrices of different rows / columns
+        this->data_ -= other.data_;
+        return *this;
+    }
+
+    constexpr f32 &operator[](usize i) { return data_[i, 0]; }
+    constexpr const f32 &operator[](usize i) const { return data_[i, 0]; }
+
+  private:
+    usize size_;
+    Matrix data_;
+};
+
+namespace Math {
+void print(const Matrix &in);
+void print(const Vector &in);
+}; // namespace Math
 
 #endif // MATRIX_H

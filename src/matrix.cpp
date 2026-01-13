@@ -12,13 +12,23 @@ Matrix::Matrix(usize nrows, usize ncols, float fillVal)
     std::fill(data_.get(), data_.get() + size_, fillVal);
 }
 
-void matPrint(const Matrix &m) {
-    auto nrows = m.rows();
-    auto ncols = m.cols();
+Vector::Vector() : size_(0), data_(Matrix()) {}
+Vector::Vector(usize nele) : size_(nele), data_(Matrix(nele, 1)) {}
+Vector::Vector(usize nele, f32 fillVal) : size_(nele), data_(Matrix(nele, 1, fillVal)) {}
 
+void Math::print(const Matrix &in) {
+    auto nrows = in.rows();
+    auto ncols = in.cols();
     for (usize r{0}; r < nrows; r++) {
         std::print("| ");
-        for (usize c{0}; c < ncols; c++) std::print("{} ", m[r, c]);
+        for (usize c{0}; c < ncols; c++) std::print("{} ", in[r, c]);
         std::println("|");
     }
+}
+
+void Math::print(const Vector &in) {
+    auto nele = in.size();
+    std::print("| ");
+    for (usize i{0}; i < nele; i++) std::print("{} ", in[i]);
+    std::println("|");
 }
