@@ -9,7 +9,7 @@
 
 using Scalar = double;
 
-class Storage {
+template <class Scalar> class Storage {
   public:
     inline std::size_t size() const noexcept { return size_; }
 

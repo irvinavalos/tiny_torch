@@ -1,108 +1,74 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <cmath>
+#include "storage.h"
+
 #include <cstddef>
-#include <cstring>
-#include <memory>
 #include <ranges>
 #include <span>
 
-using usize = std::size_t;
-
-using f32 = std::float_t;
-
-using f32p = std::unique_ptr<f32[]>;
-
-class Matrix {
+template <class T = Scalar> class Matrix : private Storage<T> {
   public:
-    Matrix();
-    Matrix(usize nrows, usize ncols);
-    // TODO: Check performance between std::make_unique and std::make_unique_for_overwrite
-    Matrix(usize nrows, usize ncols, float fillVal);
+    Matrix() : Storage<T>(), nrows_(0), ncols_(0) {}
+    Matrix(std::size_t r, std::size_t c) : Storage<T>(r * c), nrows_(r), ncols_(c) {}
+    Matrix(std::size_t r, std::size_t c, Scalar value) : Storage<T>(r * c), nrows_(r), ncols_(c) { this->fill(value); }
 
-    constexpr usize rows() const { return nrows_; }
-    constexpr usize cols() const { return ncols_; }
-    constexpr usize size() const { return size_; }
+    inline std::size_t rows() const noexcept { return nrows_; }
+    inline std::size_t cols() const noexcept { return ncols_; }
 
-    constexpr Matrix &operator+=(const Matrix &other) {
-        // TODO: Implement error checking for matrices of different rows / columns
-        std::span<f32> spanSelf(this->data_.get(), size_);
-        std::span<f32> spanOther(other.data_.get(), other.size_);
+    inline Matrix &operator+=(const Matrix &other) {
+        if (this->nrows_ != other.nrows_ || this->ncols_ != other.ncols_)
+            throw std::length_error("Matrix shape mismatch");
+
+        std::span<Scalar> spanSelf(this->data(), this->size());
+        std::span<Scalar> spanOther(other.data(), other.size());
 
         for (auto [refSelf, refOther] : std::views::zip(spanSelf, spanOther)) refSelf += refOther;
 
         return *this;
     }
 
-    constexpr Matrix operator+(const Matrix &other) {
-        Matrix ret(this->nrows_, this->ncols_);
-        std::memcpy(ret.data_.get(), this->data_.get(), size_ * sizeof(f32));
+    inline Matrix operator+(const Matrix &other) {
+        Matrix ret(nrows_, ncols_);
+        ret.copy_from(*this);
         ret += other;
         return ret;
     }
 
-    constexpr Matrix &operator-=(const Matrix &other) {
-        // TODO: Implement error checking for matrices of different rows / columns
-        std::span<f32> spanSelf(this->data_.get(), size_);
-        std::span<f32> spanOther(other.data_.get(), other.size_);
+    inline Matrix &operator-=(const Matrix &other) {
+        if (this->nrows_ != other.nrows_ || this->ncols_ != other.ncols_)
+            throw std::length_error("Matrix shape mismatch");
+
+        std::span<Scalar> spanSelf(this->data(), this->size());
+        std::span<Scalar> spanOther(other.data(), other.size());
 
         for (auto [refSelf, refOther] : std::views::zip(spanSelf, spanOther)) refSelf -= refOther;
 
         return *this;
     }
 
-    constexpr Matrix operator-(const Matrix &other) {
-        Matrix ret(this->nrows_, this->ncols_);
-        std::memcpy(ret.data_.get(), this->data_.get(), size_ * sizeof(f32));
+    inline Matrix operator-(const Matrix &other) {
+        Matrix ret(nrows_, ncols_);
+        ret.copy_from(*this);
         ret -= other;
         return ret;
     }
 
-    // TODO: Handle out of range errors
-    constexpr f32 &operator[](usize i, usize j) { return *(data_.get() + (ncols_ * i + j)); }
-    constexpr const f32 &operator[](usize i, usize j) const { return *(data_.get() + (ncols_ * i + j)); }
-
-  private:
-    usize nrows_;
-    usize ncols_;
-
-    usize size_;
-
-    f32p data_;
-};
-
-class Vector {
-  public:
-    Vector();
-    Vector(usize nele);
-    Vector(usize nele, f32 fillVal);
-
-    constexpr usize size() const { return size_; }
-
-    constexpr Vector &operator+=(const Vector &other) {
-        // TODO: Implement error checking for matrices of different rows / columns
-        this->data_ += other.data_;
-        return *this;
+    inline T &operator()(std::size_t i, std::size_t j) {
+        if (i >= nrows_ || j >= ncols_) throw std::out_of_range("Matrix::operator()");
+        return this->data()[ncols_ * i + j];
     }
 
-    constexpr Vector &operator-=(const Vector &other) {
-        // TODO: Implement error checking for matrices of different rows / columns
-        this->data_ -= other.data_;
-        return *this;
+    inline const T &operator()(std::size_t i, std::size_t j) const {
+        if (i >= nrows_ || j >= ncols_) throw std::out_of_range("Matrix::operator()");
+        return this->data()[ncols_ * i + j];
     }
 
-    constexpr f32 &operator[](usize i) { return data_[i, 0]; }
-    constexpr const f32 &operator[](usize i) const { return data_[i, 0]; }
-
   private:
-    usize size_;
-    Matrix data_;
+    std::size_t nrows_;
+    std::size_t ncols_;
 };
 
-namespace Math {
-void print(const Matrix &in);
-void print(const Vector &in);
-}; // namespace Math
+template <typename T> void print(const Matrix<T> &in);
 
 #endif // MATRIX_H
